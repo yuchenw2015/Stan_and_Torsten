@@ -1,1 +1,2 @@
 # Stan_and_Torsten
+This repository contains a few examples from 'Advanced Use of Stan, RStan and Torsten for Pharmacometric Applications' (https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-pharmacometric-applications/). For the Stan models that requires Torsten/Torsten built-in functions, it is common to fail when building those Stan models using 'rstan'. The possible reason coulb be that 'rstan' package cannot use the latest Stan or a few built-in Torsten functions have been changed but the example scripts have not.
