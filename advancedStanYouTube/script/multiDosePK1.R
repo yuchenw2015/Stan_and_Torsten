@@ -1,0 +1,212 @@
+rm(list = ls())
+gc()
+
+modelName <- "multiDosePK1"
+
+## Relative paths assuming the working directory is the script directory
+## containing this script
+scriptDir <- getwd()
+projectDir <- dirname(scriptDir)
+figDir <- file.path(projectDir, "deliv", "figure", modelName)
+tabDir <- file.path(projectDir, "deliv", "table", modelName)
+dataDir <- file.path(projectDir, "data", "derived")
+modelDir <- file.path(projectDir, "model")
+outDir <- file.path(modelDir, modelName)
+toolsDir <- file.path(scriptDir, "tools")
+
+.libPaths("lib")
+
+library(rstan)
+library(bayesplot)
+## Go back to default ggplot2 theme that was overridden by bayesplot
+theme_set(theme_gray())
+library(tidyverse)
+library(parallel)
+source(file.path(toolsDir, "stanTools.R"))
+
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+
+set.seed(10271998) ## not required but assures repeatable results
+
+################################################################################################
+
+## get data file
+xdata <- read.csv(file.path(dataDir, "prob_2fixed2.csv"))
+xdata <- xdata %>%
+  mutate(EVID = ifelse(AMT > 0, 1, 0),
+         CMT = ifelse(AMT > 0, 1, 2),
+         DV = ifelse(EVID, NA, DV))
+
+## Augment data set with new dosing records based on the ii and addl entries
+addl <- xdata %>%
+  filter(EVID == 1 & ADDL > 0) %>%
+  rowwise() %>%
+  do(as.data.frame(.)[rep(1, .$ADDL),]) %>%
+  group_by(ID) %>%
+  mutate(TIME = TIME + (1:ADDL[1]) * II,
+         ADDL = 0,
+         II = 0)
+
+xdata <- xdata %>%
+  bind_rows(addl) %>%
+  arrange(ID, TIME, desc(EVID))
+
+nt <- nrow(xdata)
+start <- (1:nt)[!duplicated(xdata$ID)]
+end <- c(start[-1] - 1, nt)
+
+## Indices of records containing observed concentrations
+iObs <- with(xdata, (1:nrow(xdata))[!is.na(DV) & EVID == 0])
+nObs <- length(iObs)
+
+nSubjects = length(unique(xdata$ID))
+
+## create data set
+data <- with(xdata,
+             list(
+                 nSubjects = nSubjects,
+                 nt = nt,
+                 nObs = nObs,
+                 iObs = iObs,
+                 amt = AMT,
+                 cmt = CMT,
+                 evid = EVID,
+                 start = start,
+                 end = end,
+                 time = TIME,
+                 cObs = DV[iObs]))
+
+## create initial estimates
+init <- function(){
+    list(CLHat = exp(rnorm(1, log(8), 0.2)),
+         VHat = exp(rnorm(1, log(50), 0.2)),
+         kaHat = exp(rnorm(1, log(0.45), 0.2)),
+         omega = exp(rnorm(3, log(0.2), 0.5)),
+         rho = diag(3),
+         sigma = runif(1, 0.5, 2),
+         logtheta = matrix(rep(log(c(8, 50, 0.45)), ea = 25), nrow = 25))
+}
+
+## Specify the variables for which you want history and density plots
+parametersToPlot <- c("CLHat", "VHat", "kaHat",
+                      "sigma", "omega", "rho")
+
+## Additional variables to monitor
+otherRVs <- c("cObsCond", "cObsPred", "CL", "V", "ka") ##, "log_lik")
+
+parameters <- c(parametersToPlot, otherRVs)
+
+################################################################################################
+# run Stan
+
+nChains <- 4
+nPost <- 1000 ## Number of post-burn-in samples per chain after thinning
+nBurn <- 1000 ## Number of burn-in samples per chain after thinning
+nThin <- 1
+
+nIter <- (nPost + nBurn) * nThin
+nBurnin <- nBurn * nThin
+
+fit <- stan(file = file.path(modelDir, paste(modelName, ".stan", sep = "")),
+            data = data,
+            pars = parameters,
+            iter = nIter,
+            warmup = nBurnin,
+            thin = nThin, 
+            init = init,
+            chains = nChains)
+##            control = list(adapt_delta = 0.9))
+
+dir.create(outDir)
+save(fit, file = file.path(outDir, paste(modelName, "Fit.Rsave", sep = "")))
+##load(file.path(outDir, paste(modelName, "Fit.Rsave", sep = "")))
+
+################################################################################################
+## posterior distributions of parameters
+ 
+dir.create(figDir)
+dir.create(tabDir)
+
+## open graphics device
+pdf(file = file.path(figDir, paste(modelName,"Plots%03d.pdf", sep = "")),
+	width = 6, height = 6, onefile = F)
+
+## Remove diagonal & redundant elements of rho
+dimRho <- nrow(init()$rho)
+parametersToPlot <- c(parametersToPlot,
+                      paste("rho[", matrix(apply(expand.grid(1:dimRho, 1:dimRho), 1, paste, collapse = ","),
+                                           ncol = dimRho)[upper.tri(diag(dimRho), diag = FALSE)], "]", sep = ""))
+parametersToPlot <- setdiff(parametersToPlot, "rho")
+
+options(bayesplot.base_size = 12,
+        bayesplot.base_family = "sans")
+color_scheme_set(scheme = "brightblue")
+myTheme <- theme(text = element_text(size = 12), axis.text = element_text(size = 12))
+
+rhats <- rhat(fit, pars = parametersToPlot)
+mcmc_rhat(rhats) + yaxis_text() + myTheme
+
+ratios1 <- neff_ratio(fit, pars = parametersToPlot)
+mcmc_neff(ratios1) + yaxis_text() + myTheme
+
+mcmcHistory(fit, pars = parametersToPlot, nParPerPage = 5, myTheme = myTheme)
+mcmcDensity(fit, pars = parametersToPlot, nParPerPage = 16, byChain = TRUE, 
+            myTheme = theme(text = element_text(size = 12), axis.text = element_text(size = 10)))
+mcmcDensity(fit, pars = parametersToPlot, nParPerPage = 16, 
+            myTheme = theme(text = element_text(size = 12), axis.text = element_text(size = 10)))
+
+pairs(fit, pars = parametersToPlot[!grepl("rho", parametersToPlot)])
+
+ptable <- monitor(as.array(fit, pars = parametersToPlot), warmup = 0, print = FALSE)
+write.csv(ptable, file = file.path(tabDir, paste(modelName, "ParameterTable.csv", sep = "")))
+
+################################################################################################
+## posterior predictive distributions
+
+# prediction of future observations in the same studies, i.e., posterior predictions
+# conditioned on observed data from the same study
+
+pred <- as.data.frame(fit, pars = "cObsCond") %>%
+  gather(factor_key = TRUE) %>%
+  mutate(value = ifelse(value == -99, NA, value)) %>%
+  group_by(key) %>%
+  summarize(lb = quantile(value, probs = 0.05, na.rm = TRUE),
+            median = quantile(value, probs = 0.5, na.rm = TRUE),
+            ub = quantile(value, probs = 0.95, na.rm = TRUE)) %>%
+  bind_cols(xdata)
+
+p1 <- ggplot(pred, aes(x = TIME, y = DV))
+p1 <- p1 + geom_point() +
+    labs(title = "individual predictions",
+         x = "time (h)",
+         y = "plasma drug concentration (mcg/mL)") +
+             theme(text = element_text(size = 12), axis.text = element_text(size = 12),
+                   legend.position = "none", strip.text = element_text(size = 8)) +
+                       facet_wrap(~ ID)
+p1 + geom_line(aes(x = TIME, y = median)) +
+    geom_ribbon(aes(ymin = lb, ymax = ub), alpha = 0.25)
+
+# prediction of future observations in a new study, i.e., posterior predictive distributions
+
+pred <- as.data.frame(fit, pars = "cObsPred") %>%
+  gather(factor_key = TRUE) %>%
+  mutate(value = ifelse(value == -99, NA, value)) %>%
+  group_by(key) %>%
+  summarize(lb = quantile(value, probs = 0.05, na.rm = TRUE),
+            median = quantile(value, probs = 0.5, na.rm = TRUE),
+            ub = quantile(value, probs = 0.95, na.rm = TRUE)) %>%
+  bind_cols(xdata)
+
+p1 <- ggplot(pred, aes(x = TIME, y = DV))
+p1 <- p1 + geom_point() +
+    labs(title = "population predictions",
+         x = "time (h)",
+         y = "plasma drug concentration (mcg/mL)") +
+             theme(text = element_text(size = 12), axis.text = element_text(size = 12),
+                   legend.position = "none", strip.text = element_text(size = 8)) +
+                       facet_wrap(~ ID)
+p1 + geom_line(aes(x = TIME, y = median)) +
+    geom_ribbon(aes(ymin = lb, ymax = ub), alpha = 0.25)
+
+dev.off()
