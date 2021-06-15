@@ -6,4 +6,4 @@ Here are the updates made in each example script:
 1. In each .stan file, the Torsten built-in function names are updated and the output matrix dimensions are updated accordingly.
 2. In each .R file, the model fitting codes using 'rstan' function 'stan()' are updated to using 'cmdstanr' functions, and the cmdstan outputs are converted to stan fit output.
 
-Stan_and_Torsten.html is a step-by-step document to show how to modify scripts and compare the non-Torsten-used model to the Torsten-used model.
+https://yuchenw2015.github.io/Stan_and_Torsten/ is a step-by-step document to show how to modify scripts and compare the non-Torsten-used model to the Torsten-used model.
