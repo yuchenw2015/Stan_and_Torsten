@@ -1,3 +1,15 @@
+////////////////////////////////////////////////////////////////////////
+//// Adapted by Yuchen Wang                     
+//// Scripts adapted due to the updates of Torsten built-in functions                      
+//// Function names and the related matrix/vector dimensions apdated
+//// R scripts adapted to call these Torsten functions, see .R files
+//// Date: June/15/2021
+//// email: yuchenw2015@gmail.com
+//// Based on the PKPD Stan course by Bill Gillespie
+//// Link of the original materials: 
+//// https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-
+//// pharmacometric-applications/
+///////////////////////////////////////////////////////////////////////
 data{
   int<lower = 1> nId;
   int<lower = 1> nt;
@@ -90,7 +102,8 @@ transformed parameters{
   vector[nObsPK] cHatObs;
   vector[nObsPD] respHatObs;
   matrix[nCmt, nCmt] K;
-  matrix[nt, nCmt] x;
+  //matrix[nt, nCmt] x;
+  matrix[nCmt, nt] x; //adapt dimension
 
   k10 = CLHat / V1Hat;
   k12 = QHat / V1Hat;
@@ -125,7 +138,8 @@ transformed parameters{
     K[4, 2] = ke0[j];
     K[4, 4] = -ke0[j];
 
-    x[start[j]:end[j],] = linOdeModel(time[start[j]:end[j]], 
+    //x[start[j]:end[j],] = linOdeModel(time[start[j]:end[j]], 
+    x[start[j]:end[j],] = pmx_solve_linode(time[start[j]:end[j]], 
 				      amt[start[j]:end[j]],
 				      rate[start[j]:end[j]],
 				      ii[start[j]:end[j]],
@@ -135,8 +149,12 @@ transformed parameters{
 				      ss[start[j]:end[j]],
 				      K, F, tLag);
 
-    cHat[start[j]:end[j]] = x[start[j]:end[j], 2] / V1[j];
-    ceHat[start[j]:end[j]] = x[start[j]:end[j], 4] / V1[j];
+    //cHat[start[j]:end[j]] = x[start[j]:end[j], 2] / V1[j];
+    //ceHat[start[j]:end[j]] = x[start[j]:end[j], 4] / V1[j];
+    //adapt dimension
+    cHat[start[j]:end[j]] = (x[2, start[j]:end[j],])' / V1[j];
+    ceHat[start[j]:end[j]] = (x[4, start[j]:end[j],])' / V1[j];
+    
     for(i in start[j]:end[j])
       respHat[i] = E0[j] + Emax[j] * ceHat[i]^gamma / (EC50^gamma + ceHat[i]^gamma);
   }
@@ -219,7 +237,8 @@ generated quantities{
     KPred[4, 2] = ke0Pred[j];
     KPred[4, 4] = -ke0Pred[j];
 
-    xPred[start[j]:end[j],] = linOdeModel(time[start[j]:end[j]], 
+    //xPred[start[j]:end[j],] = linOdeModel(time[start[j]:end[j]], 
+    xPred[start[j]:end[j],] = (pmx_solve_linode(time[start[j]:end[j]], //adapt function name
 					  amt[start[j]:end[j]],
 					  rate[start[j]:end[j]],
 					  ii[start[j]:end[j]],
@@ -227,7 +246,8 @@ generated quantities{
 					  cmt[start[j]:end[j]],
 					  addl[start[j]:end[j]],
 					  ss[start[j]:end[j]],
-					  KPred, F, tLag);
+					  //KPred, F, tLag);
+					  KPred, F, tLag))'; //adapt dimension of returned object
 
     cHatPred[start[j]:end[j]] = xPred[start[j]:end[j], 2] / V1Pred[j];
     ceHatPred[start[j]:end[j]] = xPred[start[j]:end[j], 4] / V1Pred[j];
