@@ -44,9 +44,9 @@ options(mc.cores = parallel::detectCores())
 set.seed(11191951) ## not required but assures repeatable results
 
 #Load cmdstanr package and the cmdstan path
-#Assuming the cmdstan is under the local Documents/Trosten folder
+#Change the cmdstan path accordingly
 library(cmdstanr)
-set_cmdstan_path(path = "~/User/Documents/Torsten/cmdstan")
+set_cmdstan_path(path = "/pkpd/Torsten/cmdstan")
 ################################################################################################
 
 ## get data file
