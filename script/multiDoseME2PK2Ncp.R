@@ -1,3 +1,16 @@
+#######################################################################
+#### Adapted by Yuchen Wang                     
+#### Scripts adapted to build and fit Stan model from cmdstans                      
+#### Fit object converted from cmdsran fit to stan fit
+#### Stan model adapted due to the function update, see .stan files
+#### Date: June/15/2021
+#### email: yuchenw2015@gmail.com
+#### Based on the PKPD Stan course by Bill Gillespie
+#### Link of the original materials: 
+#### https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-
+#### pharmacometric-applications/
+#######################################################################
+
 rm(list = ls())
 gc()
 
@@ -7,10 +20,10 @@ modelName <- "multiDoseME2PK2Ncp"
 ## demonstration purposes
 demo <- TRUE
 
-## Relative paths assuming the working directory is the script directory
-## containing this script
+## Relative paths assuming the working directory is the Stan_and_Torsten directory
+
 scriptDir <- getwd()
-projectDir <- dirname(scriptDir)
+projectDir <- scriptDir
 figDir <- file.path(projectDir, "deliv", "figure", modelName)
 tabDir <- file.path(projectDir, "deliv", "table", modelName)
 dataDir <- file.path(projectDir, "data", "derived")
@@ -18,10 +31,9 @@ modelDir <- file.path(projectDir, "model")
 outDir <- file.path(modelDir, modelName)
 toolsDir <- file.path(scriptDir, "tools")
 
-.libPaths("lib")
-
 library(rstan)
 library(bayesplot)
+library(ggplot2)
 library(tidyverse)
 library(parallel)
 source(file.path(toolsDir, "stanTools.R"))
@@ -31,7 +43,12 @@ options(mc.cores = parallel::detectCores())
 
 set.seed(11191951) ## not required but assures repeatable results
 
+#Load cmdstanr package and the cmdstan path
+#Assuming the cmdstan is under the local Documents/Trosten folder
+library(cmdstanr)
+set_cmdstan_path(path = "~/User/Documents/Torsten/cmdstan")
 ################################################################################################
+
 
 ## get data file
 xdata <- read.csv(file.path(dataDir, "fxaNONMEMData.csv"), as.is = TRUE)
@@ -147,17 +164,39 @@ nThin <- 1
 nIter <- (nPost + nBurn) * nThin
 nBurnin <- nBurn * nThin
 
-fit <- stan(file = file.path(modelDir, paste(modelName, ".stan", sep = "")),
-            data = data,
-            pars = parameters,
-            iter = nIter,
-            warmup = nBurnin,
-            thin = nThin, 
-            init = init,
-            chains = nChains,
-            refresh = 1,
-            control = list(adapt_delta = 0.9))
+####################### build and fit Stan model via rstan #########################
+#fit <- stan(file = file.path(modelDir, paste(modelName, ".stan", sep = "")),
+#            data = data,
+#            pars = parameters,
+#            iter = nIter,
+#            warmup = nBurnin,
+#            thin = nThin, 
+#            init = init,
+#            chains = nChains,
+#            refresh = 1,
+#            control = list(adapt_delta = 0.9))
 
+####################### build and fit Stan model via cmdstanr #########################
+nSample <- nIter - nBurnin
+#build the model via cmdstan_model
+#quiet = F will show all details while building the Stan model
+mod <- cmdstan_model(file.path(modelDir, paste(modelName, ".stan", sep = "")), quiet = T)
+##fit the model and do MCMC sampling
+fit.cmdstan <- mod$sample(data = data,
+                          seed = 11191951,
+                          refresh = 25, ##the process script will refresh every 25 samplings
+                          init = init,
+                          chains = nChains,
+                          parallel_chains = min(nChains, detectCores()),
+                          iter_warmup = nBurnin,
+                          iter_sampling = nSample,
+			  adapt_delta = 0.9,
+                          thin = nThin)
+##convert the fit output to a stan fit object
+fit <- read_stan_csv(fit.cmdstan$output_files())
+################################################################################################
+
+##save the output
 dir.create(outDir)
 save(fit, file = file.path(outDir, paste(modelName, "Fit.Rsave", sep = "")))
 ##load(file.path(outDir, paste(modelName, "Fit.Rsave", sep = "")))
