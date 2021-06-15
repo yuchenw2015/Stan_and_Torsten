@@ -143,8 +143,8 @@ fit.cmdstan <- mod$sample(data = data,
                           parallel_chains = min(nChains, detectCores()),
                           iter_warmup = nBurnin,
                           iter_sampling = nSample,
-                          thin = nThin,
-			  adapt_delta = 0.9)
+#			  adapt_delta = 0.9,
+                          thin = nThin)
 ##convert the fit output to a stan fit object
 fit <- read_stan_csv(fit.cmdstan$output_files())
 ################################################################################################
