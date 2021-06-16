@@ -7,8 +7,7 @@
 //// email: yuchenw2015@gmail.com
 //// Based on the PKPD Stan course by Bill Gillespie
 //// Link of the original materials: 
-//// https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-
-//// pharmacometric-applications/
+//// https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-pharmacometric-applications/
 ///////////////////////////////////////////////////////////////////////
 data{
   // General data items
@@ -96,7 +95,7 @@ transformed parameters{
     
     parms = {CL[j], V[j], ka[j]};
 
-    //x[start[j]:end[j],] = PKModelOneCpt(time[start[j]:end[j]], 
+    // x[start[j]:end[j],] = PKModelOneCpt(time[start[j]:end[j]], 
     x[start[j]:end[j],] = (pmx_solve_onecpt(time[start[j]:end[j]], 
 					amt[start[j]:end[j]],
 					rate[start[j]:end[j]],
@@ -105,7 +104,7 @@ transformed parameters{
 					cmt[start[j]:end[j]],
 					addl[start[j]:end[j]],
 					ss[start[j]:end[j]],
-					parms, F, tLag))'; //adapt function name and dimension
+					parms, F, tLag))'; // adapt function name and dimension
 
     // Calculate target concentration for specified compartment.
     // Change compartment number and distribution volume as appropriate.
@@ -160,7 +159,7 @@ generated quantities{
     
     parmsPred = {CLPred[j], VPred[j], kaPred[j]};
 
-    //xPred[start[j]:end[j],] = PKModelOneCpt(time[start[j]:end[j]], 
+    // xPred[start[j]:end[j],] = PKModelOneCpt(time[start[j]:end[j]], 
     xPred[start[j]:end[j],] = (pmx_solve_onecpt(time[start[j]:end[j]], 
 					    amt[start[j]:end[j]],
 					    rate[start[j]:end[j]],
@@ -169,7 +168,7 @@ generated quantities{
 					    cmt[start[j]:end[j]],
 					    addl[start[j]:end[j]],
 					    ss[start[j]:end[j]],
-					    parmsPred, F, tLag))'; //adapt function name and dimension
+					    parmsPred, F, tLag))'; // adapt function name and dimension
 
     // Calculate target concentration for specified compartment.
     // Change compartment number and distribution volume as appropriate.
