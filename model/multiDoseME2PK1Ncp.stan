@@ -120,7 +120,7 @@ model{
   //  logtheta ~ multi_normal(log(thetaHat), Omega);
   to_vector(eta) ~ normal(0, 1);
 
-  logCObs ~ normal(log(cHatObs), sigma); ## observed data likelihood
+  logCObs ~ normal(log(cHatObs), sigma); // observed data likelihood
 }
 
 generated quantities{

@@ -67,7 +67,7 @@ transformed parameters{
   thetaHat[4] = V2Hat;
   thetaHat[5] = kaHat;
 
-  Omega = quad_form_diag(rho, omega); ## diag_matrix(omega) * rho * diag_matrix(omega)
+  Omega = quad_form_diag(rho, omega); // diag_matrix(omega) * rho * diag_matrix(omega)
 
   for(j in 1:nSubjects){
     CL[j] = exp(logtheta[j, 1]) * (weight[j] / 70)^0.75;
@@ -96,7 +96,7 @@ transformed parameters{
     cHat[start[j]:end[j]] = x[start[j]:end[j], 2] ./ V1[j];
   }
 
-  cHatObs = cHat[iObs]; ## predictions for observed data records
+  cHatObs = cHat[iObs]; // predictions for observed data records
 
 }
 
@@ -110,10 +110,10 @@ model{
   rho ~ lkj_corr(1); 
   sigma ~ cauchy(0, 1);
 
-  ## Inter-individual variability
+  // Inter-individual variability
   logtheta ~ multi_normal(log(thetaHat), Omega);
 
-  logCObs ~ normal(log(cHatObs), sigma); ## observed data likelihood
+  logCObs ~ normal(log(cHatObs), sigma); // observed data likelihood
 }
 
 generated quantities{

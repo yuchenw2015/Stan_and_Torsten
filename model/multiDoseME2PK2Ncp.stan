@@ -15,8 +15,8 @@ data{
   int<lower = 1> nObs;
   int<lower = 0> nBql;
   int<lower = 1> iObs[nObs];
-  int<lower = 1> iBql[nBql]; ## indices of BQL data records
-  real<lower = 0> loq; ## limit of quantitation
+  int<lower = 1> iBql[nBql]; // indices of BQL data records
+  real<lower = 0> loq; // limit of quantitation
   real<lower = 0> amt[nt];
   int<lower = 1> cmt[nt];
   int<lower = 0> evid[nt];
@@ -74,7 +74,7 @@ transformed parameters{
   thetaHat[4] = V2Hat;
   thetaHat[5] = kaHat;
 
-//  Omega = quad_form_diag(rho, omega); ## diag_matrix(omega) * rho * diag_matrix(omega)
+//  Omega = quad_form_diag(rho, omega); // diag_matrix(omega) * rho * diag_matrix(omega)
   theta = (rep_matrix(thetaHat, nSubjects) .* 
           exp(diag_pre_multiply(omega, L * eta)))';
 
@@ -105,8 +105,8 @@ transformed parameters{
     cHat[start[j]:end[j]] = x[start[j]:end[j], 2] ./ V1[j];
   }
 
-  cHatObs = cHat[iObs]; ## predictions for observed data records
-  cHatBql = cHat[iBql]; ## predictions for BQL data records
+  cHatObs = cHat[iObs]; // predictions for observed data records
+  cHatBql = cHat[iBql]; // predictions for BQL data records
 
 }
 
@@ -121,12 +121,12 @@ model{
   L ~ lkj_corr_cholesky(1);
   sigma ~ cauchy(0, 1);
 
-  ## Inter-individual variability
+  // Inter-individual variability
 //  logtheta ~ multi_normal(log(thetaHat), Omega);
   to_vector(eta) ~ normal(0, 1);
 
-  logCObs ~ normal(log(cHatObs), sigma); ## observed data likelihood
-  target += normal_lcdf(log(loq) | log(cHatBql), sigma); ## BQL data likelihood
+  logCObs ~ normal(log(cHatObs), sigma); // observed data likelihood
+  target += normal_lcdf(log(loq) | log(cHatBql), sigma); // BQL data likelihood
 }
 
 generated quantities{
