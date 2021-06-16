@@ -7,8 +7,7 @@
 //// email: yuchenw2015@gmail.com
 //// Based on the PKPD Stan course by Bill Gillespie
 //// Link of the original materials: 
-//// https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-
-//// pharmacometric-applications/
+//// https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-pharmacometric-applications/
 ///////////////////////////////////////////////////////////////////////
 data{
   int<lower = 1> nId;
