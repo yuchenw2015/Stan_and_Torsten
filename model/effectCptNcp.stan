@@ -137,7 +137,7 @@ transformed parameters{
     K[4, 2] = ke0[j];
     K[4, 4] = -ke0[j];
 
-    //x[start[j]:end[j],] = linOdeModel(time[start[j]:end[j]], 
+    // x[start[j]:end[j],] = linOdeModel(time[start[j]:end[j]], 
     x[start[j]:end[j],] = (pmx_solve_linode(time[start[j]:end[j]], 
 				      amt[start[j]:end[j]],
 				      rate[start[j]:end[j]],
@@ -146,7 +146,7 @@ transformed parameters{
 				      cmt[start[j]:end[j]],
 				      addl[start[j]:end[j]],
 				      ss[start[j]:end[j]],
-				      K, F, tLag))'; //adapt function name and dimension
+				      K, F, tLag))'; // adapt function name and dimension
 
     cHat[start[j]:end[j]] = x[start[j]:end[j], 2] / V1[j];
     ceHat[start[j]:end[j]] = x[start[j]:end[j], 4] / V1[j];
@@ -233,8 +233,8 @@ generated quantities{
     KPred[4, 2] = ke0Pred[j];
     KPred[4, 4] = -ke0Pred[j];
 
-    //xPred[start[j]:end[j],] = linOdeModel(time[start[j]:end[j]], 
-    xPred[start[j]:end[j],] = (pmx_solve_linode(time[start[j]:end[j]], //adapt function name
+    // xPred[start[j]:end[j],] = linOdeModel(time[start[j]:end[j]], 
+    xPred[start[j]:end[j],] = (pmx_solve_linode(time[start[j]:end[j]], // adapt function name
 					  amt[start[j]:end[j]],
 					  rate[start[j]:end[j]],
 					  ii[start[j]:end[j]],
@@ -243,7 +243,7 @@ generated quantities{
 					  addl[start[j]:end[j]],
 					  ss[start[j]:end[j]],
 					  //KPred, F, tLag);
-					  KPred, F, tLag))'; //adapt dimension of returned object
+					  KPred, F, tLag))'; // adapt dimension of returned object
 
     cHatPred[start[j]:end[j]] = xPred[start[j]:end[j], 2] / V1Pred[j];
     ceHatPred[start[j]:end[j]] = xPred[start[j]:end[j], 4] / V1Pred[j];
