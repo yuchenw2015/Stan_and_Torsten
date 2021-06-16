@@ -15,10 +15,10 @@ gc()
 
 modelName <- "effCptSinglePatientTorsten"
 
-## Relative paths assuming the working directory is the Stan_and_Torsten directory
-
+## Relative paths assuming the working directory is the script directory
+## containing this script
 scriptDir <- getwd()
-projectDir <- scriptDir
+projectDir <- dirname(scriptDir)
 figDir <- file.path(projectDir, "deliv", "figure", modelName)
 tabDir <- file.path(projectDir, "deliv", "table", modelName)
 dataDir <- file.path(projectDir, "data", "derived")
