@@ -7,8 +7,7 @@
 //// email: yuchenw2015@gmail.com
 //// Based on the PKPD Stan course by Bill Gillespie
 //// Link of the original materials: 
-//// https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-
-//// pharmacometric-applications/
+//// https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-pharmacometric-applications/
 ///////////////////////////////////////////////////////////////////////
 functions{
 
@@ -111,7 +110,7 @@ generated quantities{
 			     addl[start[j]:end[j]],
 			     ss[start[j]:end[j]],
 			     parms, F, tLag,
-			     1e-6, 1e-6, 1e8)); // adapt function name and dimension
+			     1e-6, 1e-6, 1e8))'; // adapt function name and dimension
 
     cHat[start[j]:end[j]] = x[start[j]:end[j], 1] / V[j];
     ce[start[j]:end[j]] = x[start[j]:end[j], 2];
