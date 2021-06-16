@@ -7,8 +7,7 @@
 //// email: yuchenw2015@gmail.com
 //// Based on the PKPD Stan course by Bill Gillespie
 //// Link of the original materials: 
-//// https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-
-//// pharmacometric-applications/
+//// https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-pharmacometric-applications/
 ///////////////////////////////////////////////////////////////////////
 functions{
 
@@ -129,7 +128,7 @@ generated quantities{
   // x = generalOdeModel_rk45(twoCptNeutModelODE, 8,
   x = (pmx_solve_rk45(twoCptNeutModelODE, 8,
 			   time, amt, rate, ii, evid, cmt, addl, ss,
-			   parms, F, tLag,1e-6, 1e-6, 1e8))'; //adapt function name and dimension
+			   parms, F, tLag,1e-6, 1e-6, 1e8))'; // adapt function name and dimension
 
   cHat = x[, 2] / V1;
   neutHat = x[, 8] + circ0;
