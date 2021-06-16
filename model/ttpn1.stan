@@ -1,3 +1,15 @@
+////////////////////////////////////////////////////////////////////////
+//// Adapted by Yuchen Wang                     
+//// Scripts adapted due to the updates of Torsten built-in functions                      
+//// Function names and the related matrix/vector dimensions apdated
+//// R scripts adapted to call these Torsten functions, see .R files
+//// Date: June/15/2021
+//// email: yuchenw2015@gmail.com
+//// Based on the PKPD Stan course by Bill Gillespie
+//// Link of the original materials: 
+//// https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-
+//// pharmacometric-applications/
+///////////////////////////////////////////////////////////////////////
 functions{
 
     real[] oneCptPNODE(real t,
@@ -114,7 +126,8 @@ transformed parameters{
     parms = {CL[j], V[j], ke0, alpha, beta};
 //    print(parms)
 
-    x[start[j]:end[j],] = generalOdeModel_rk45(oneCptPNODE, 3,
+    // x[start[j]:end[j],] = generalOdeModel_rk45(oneCptPNODE, 3,
+    x[start[j]:end[j],] = (pmx_solve_rk45(oneCptPNODE, 3,
 			     time[start[j]:end[j]], 
 			     amt[start[j]:end[j]],
 			     rate[start[j]:end[j]],
@@ -124,7 +137,7 @@ transformed parameters{
 			     addl[start[j]:end[j]],
 			     ss[start[j]:end[j]],
 			     parms, F, tLag,
-			     1e-6, 1e-6, 1e8);
+			     1e-6, 1e-6, 1e8))'; //adapt function name and dimension
 			     
 		for(i in start[j]:end[j]){
 		  for(k in 1:nCmt){
@@ -192,7 +205,8 @@ generated quantities{
 
     parmsPred = {CLPred[j], VPred[j], ke0, alpha, beta};
 
-    xPred[start[j]:end[j],] = generalOdeModel_rk45(oneCptPNODE, 3,
+    // xPred[start[j]:end[j],] = generalOdeModel_rk45(oneCptPNODE, 3,
+    xPred[start[j]:end[j],] = (pmx_solve_rk45(oneCptPNODE, 3,
 			     time[start[j]:end[j]], 
 			     amt[start[j]:end[j]],
 			     rate[start[j]:end[j]],
@@ -202,7 +216,7 @@ generated quantities{
 			     addl[start[j]:end[j]],
 			     ss[start[j]:end[j]],
 			     parmsPred, F, tLag,
-			     1e-6, 1e-6, 1e8);
+			     1e-6, 1e-6, 1e8))'; //adapt function name and dimension
 			     
 		for(i in start[j]:end[j]){
 		  for(k in 1:nCmt){
@@ -229,7 +243,8 @@ generated quantities{
     parmsPred = {CLPred[j], VPred[j], ke0, alpha, beta};
     amtPred[1] = amt[start[j]];
 
-    cdfPred[j] =  1 - exp(-generalOdeModel_rk45(oneCptPNODE, 3,
+    //cdfPred[j] =  1 - exp(-generalOdeModel_rk45(oneCptPNODE, 3,
+    cdfPred[j] =  1 - exp(-(pmx_solve_rk45(oneCptPNODE, 3,
 						tPred, 
 						amtPred,
 						ratePred,
@@ -239,7 +254,7 @@ generated quantities{
 						addlPred,
 						ssPred,
 						parmsPred, F, tLag,
-						1e-6, 1e-6, 1e8)[,3]);
+						1e-6, 1e-6, 1e8))'[,3]); //adapt function name and dimension
 
   }
 
