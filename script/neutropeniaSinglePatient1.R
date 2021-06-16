@@ -24,7 +24,7 @@ figDir <- file.path(projectDir, "deliv", "figure", modelName)
 tabDir <- file.path(projectDir, "deliv", "table", modelName)
 dataDir <- file.path(projectDir, "data", "derived")
 modelDir <- file.path(projectDir, "model")
-outDir <- file.path(modelDir, modelName)
+outDir <- file.path(scriptDir, modelName)
 toolsDir <- file.path(scriptDir, "tools")
 
 library(rstan)
