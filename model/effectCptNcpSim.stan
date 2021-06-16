@@ -1,3 +1,16 @@
+////////////////////////////////////////////////////////////////////////
+//// Adapted by Yuchen Wang                     
+//// Scripts adapted due to the updates of Torsten built-in functions                      
+//// Function names and the related matrix/vector dimensions apdated
+//// R scripts adapted to call these Torsten functions via cmdstan, see .R files
+//// Date: June/15/2021
+//// email: yuchenw2015@gmail.com
+//// Based on the PKPD Stan course by Bill Gillespie
+//// Link of the original materials: 
+//// https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-
+//// pharmacometric-applications/
+///////////////////////////////////////////////////////////////////////
+
 data{
   int<lower = 1> nId;
   int<lower = 1> nt;
@@ -89,7 +102,8 @@ generated quantities{
     K[4, 2] = ke0[j];
     K[4, 4] = -ke0[j];
 
-    x[start[j]:end[j],] = linOdeModel(time[start[j]:end[j]], 
+    //x[start[j]:end[j],] = linOdeModel(time[start[j]:end[j]],  
+    x[start[j]:end[j],] = (pmx_solve_linode(time[start[j]:end[j]],  //adapt function names  
 				      amt[start[j]:end[j]],
 				      rate[start[j]:end[j]],
 				      ii[start[j]:end[j]],
@@ -97,7 +111,8 @@ generated quantities{
 				      cmt[start[j]:end[j]],
 				      addl[start[j]:end[j]],
 				      ss[start[j]:end[j]],
-				      K, F, tLag);
+				      //K, F, tLag);
+				      K, F, tLag))'; //adapt dimensions
 
     cHat[start[j]:end[j]] = x[start[j]:end[j], 2] / V1[j];
     ceHat[start[j]:end[j]] = x[start[j]:end[j], 4] / V1[j];
