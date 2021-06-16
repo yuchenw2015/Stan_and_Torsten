@@ -137,13 +137,22 @@ dataSim <- with(allData,
                      sigmaPD = sigmaPD))
 
 ### Simulate using Stan
-
-sim <- stan(file = file.path(modelDir, paste(simModelName, ".stan", sep = "")),
-            data = dataSim,
-            algorithm = "Fixed_param",
-            iter = 1,
-            chains = 1)
-
+#######################Simulate via rstan#################################
+#sim <- stan(file = file.path(modelDir, paste(simModelName, ".stan", sep = "")),
+#            data = dataSim,
+#            algorithm = "Fixed_param",
+#            iter = 1,
+#            chains = 1)
+#######################Simulate vis cmdstanr #############################
+mod.sim <- cmdstan_model(file.path(modelDir, paste(simModelName, ".stan", sep = "")), quiet=T)
+sim.cmdstan <- mod.sim$sample(data = dataSim,
+                  chains=1,
+                  #iter_warmup = 0,
+                  iter_sampling = 1,
+                  thin = 1,
+                  fixed_param = T)
+#convert output to a stan fit object
+sim <- read_stan_csv(sim.cmdstan$output_files())
 ################################################################################################
 ### Assemble data set for fitting via Stan
 
