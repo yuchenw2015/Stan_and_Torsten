@@ -1,3 +1,15 @@
+////////////////////////////////////////////////////////////////////////
+//// Adapted by Yuchen Wang                     
+//// Scripts adapted due to the updates of Torsten built-in functions                      
+//// Function names and the related matrix/vector dimensions apdated
+//// R scripts adapted to call these Torsten functions, see .R files
+//// Date: June/15/2021
+//// email: yuchenw2015@gmail.com
+//// Based on the PKPD Stan course by Bill Gillespie
+//// Link of the original materials: 
+//// https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-
+//// pharmacometric-applications/
+///////////////////////////////////////////////////////////////////////
 data{
   // General data items
   int<lower = 1> nSubjects;
@@ -84,7 +96,8 @@ transformed parameters{
     
     parms = {CL[j], V[j], ka[j]};
 
-    x[start[j]:end[j],] = PKModelOneCpt(time[start[j]:end[j]], 
+    //x[start[j]:end[j],] = PKModelOneCpt(time[start[j]:end[j]], 
+    x[start[j]:end[j],] = (pmx_solve_onecpt(time[start[j]:end[j]], 
 					amt[start[j]:end[j]],
 					rate[start[j]:end[j]],
 					ii[start[j]:end[j]],
@@ -92,7 +105,7 @@ transformed parameters{
 					cmt[start[j]:end[j]],
 					addl[start[j]:end[j]],
 					ss[start[j]:end[j]],
-					parms, F, tLag);
+					parms, F, tLag))'; //adapt function name and dimension
 
     // Calculate target concentration for specified compartment.
     // Change compartment number and distribution volume as appropriate.
@@ -147,7 +160,8 @@ generated quantities{
     
     parmsPred = {CLPred[j], VPred[j], kaPred[j]};
 
-    xPred[start[j]:end[j],] = PKModelOneCpt(time[start[j]:end[j]], 
+    //xPred[start[j]:end[j],] = PKModelOneCpt(time[start[j]:end[j]], 
+    xPred[start[j]:end[j],] = (pmx_solve_onecpt(time[start[j]:end[j]], 
 					    amt[start[j]:end[j]],
 					    rate[start[j]:end[j]],
 					    ii[start[j]:end[j]],
@@ -155,7 +169,7 @@ generated quantities{
 					    cmt[start[j]:end[j]],
 					    addl[start[j]:end[j]],
 					    ss[start[j]:end[j]],
-					    parmsPred, F, tLag);
+					    parmsPred, F, tLag))'; //adapt function name and dimension
 
     // Calculate target concentration for specified compartment.
     // Change compartment number and distribution volume as appropriate.
