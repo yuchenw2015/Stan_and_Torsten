@@ -2,7 +2,7 @@
 //// Adapted by Yuchen Wang                     
 //// Scripts adapted due to the updates of Torsten built-in functions                      
 //// Function names and the related matrix/vector dimensions apdated
-//// R scripts adapted to call these Torsten functions, see .R files
+//// R scripts adapted to call these Torsten functions via cmdstan, see .R files
 //// Date: June/15/2021
 //// email: yuchenw2015@gmail.com
 //// Based on the PKPD Stan course by Bill Gillespie
@@ -66,9 +66,9 @@ transformed parameters{
   K[4, 2] = ke0;
   K[4, 4] = -ke0;
 
-  //x = linOdeModel(time, amt, rate, ii, evid, cmt, addl, ss,
+  // x = linOdeModel(time, amt, rate, ii, evid, cmt, addl, ss,
 	//	  K, F, tLag);
-  x = (pmx_solve_linode(time, amt, rate, ii, evid, cmt, addl, ss, K, F, tLag))'; //adapt function name and dimension
+  x = (pmx_solve_linode(time, amt, rate, ii, evid, cmt, addl, ss, K, F, tLag))'; // adapt function name and dimension
                   
   cHat = x[ ,2] ./ V1;
   ceHat = x[ ,4] ./ V1;
