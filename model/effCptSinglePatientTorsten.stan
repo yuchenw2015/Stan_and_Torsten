@@ -52,8 +52,7 @@ transformed parameters{
   vector<lower = 0>[nt] cHat;
   vector<lower = 0>[nt] respHat;
   vector<lower = 0>[nt] ceHat;
-  //matrix[nt, nCmt] x;
-  matrix[nCmt, nt] x; //adapt the matrix dimention
+  matrix[nt, nCmt] x;
   matrix[nCmt, nCmt] K;
 
   K = rep_matrix(0, nCmt, nCmt);
@@ -69,13 +68,10 @@ transformed parameters{
 
   //x = linOdeModel(time, amt, rate, ii, evid, cmt, addl, ss,
 	//	  K, F, tLag);
-	x = pmx_solve_linode(time, amt, rate, ii, evid, cmt, addl, ss,
-		  K, F, tLag); //adapt function name
+  x = (pmx_solve_linode(time, amt, rate, ii, evid, cmt, addl, ss, K, F, tLag))'; //adapt function name and dimension
                   
-  //cHat = x[ ,2] ./ V1;
-  //ceHat = x[ ,4] ./ V1;
-  cHat = (x[2, ] ./ V1)'; //adapt the dimension;
-  ceHat = (x[4, ] ./ V1)'; //adapt the dimension
+  cHat = x[ ,2] ./ V1;
+  ceHat = x[ ,4] ./ V1;
   respHat = 100 * ceHat ./ (EC50 + ceHat);
 
 }
