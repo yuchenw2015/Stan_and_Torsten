@@ -7,8 +7,7 @@
 #### email: yuchenw2015@gmail.com
 #### Based on the PKPD Stan course by Bill Gillespie
 #### Link of the original materials: 
-#### https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-
-#### pharmacometric-applications/
+#### https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-pharmacometric-applications/
 #######################################################################
 
 rm(list = ls())
@@ -160,8 +159,6 @@ nBurnin <- nBurn * nThin
 #            init = init,
 #            chains = nChains,
 #            control = list(adapt_delta = 0.9))
-
-
 ####################### build and fit Stan model via cmdstanr #########################
 nSample <- nIter - nBurnin
 #build the model via cmdstan_model
