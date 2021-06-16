@@ -209,12 +209,12 @@ dir.create(tabDir)
 pdf(file = file.path(figDir, paste(modelName,"Plots%03d.pdf", sep = "")),
 	width = 6, height = 6, onefile = F)
 
-## Remove diagonal & redundant elements of rho
-dimRho <- nrow(init()$rho)
+## Remove diagonal & redundant elements of L
+dimL <- nrow(init()$L)
 parametersToPlot <- c(parametersToPlot,
-                     paste("rho[", matrix(apply(expand.grid(1:dimRho, 1:dimRho), 1, paste, collapse = ","),
-                                          ncol = dimRho)[upper.tri(diag(dimRho), diag = FALSE)], "]", sep = ""))
-parametersToPlot <- setdiff(parametersToPlot, "rho")
+                     paste("L[", matrix(apply(expand.grid(1:dimL, 1:dimL), 1, paste, collapse = ","),
+                                          ncol = dimL)[upper.tri(diag(dimL), diag = FALSE)], "]", sep = ""))
+parametersToPlot <- setdiff(parametersToPlot, "L")
 
 options(bayesplot.base_size = 12,
         bayesplot.base_family = "sans")
@@ -233,7 +233,7 @@ mcmcDensity(fit, pars = parametersToPlot, nParPerPage = 16, byChain = TRUE,
 mcmcDensity(fit, pars = parametersToPlot, nParPerPage = 16, 
             myTheme = theme(text = element_text(size = 12), axis.text = element_text(size = 10)))
 
-pairs(fit, pars = parametersToPlot[!grepl("rho", parametersToPlot)])
+pairs(fit, pars = parametersToPlot[!grepl("L", parametersToPlot)])
 
 ptable <- monitor(as.array(fit, pars = parametersToPlot), warmup = 0, print = FALSE)
 write.csv(ptable, file = file.path(tabDir, paste(modelName, "ParameterTable.csv", sep = "")))
@@ -371,3 +371,4 @@ for(thisPage in 1:nPages){
 }
 
 dev.off()
+
