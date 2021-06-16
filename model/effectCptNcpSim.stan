@@ -102,8 +102,8 @@ generated quantities{
     K[4, 2] = ke0[j];
     K[4, 4] = -ke0[j];
 
-    //x[start[j]:end[j],] = linOdeModel(time[start[j]:end[j]],  
-    x[start[j]:end[j],] = (pmx_solve_linode(time[start[j]:end[j]],  //adapt function names  
+    // x[start[j]:end[j],] = linOdeModel(time[start[j]:end[j]],  
+    x[start[j]:end[j],] = (pmx_solve_linode(time[start[j]:end[j]], // adapt function names  
 				      amt[start[j]:end[j]],
 				      rate[start[j]:end[j]],
 				      ii[start[j]:end[j]],
@@ -112,7 +112,7 @@ generated quantities{
 				      addl[start[j]:end[j]],
 				      ss[start[j]:end[j]],
 				      //K, F, tLag);
-				      K, F, tLag))'; //adapt dimensions
+				      K, F, tLag))'; //adapt dimension
 
     cHat[start[j]:end[j]] = x[start[j]:end[j], 2] / V1[j];
     ceHat[start[j]:end[j]] = x[start[j]:end[j], 4] / V1[j];
