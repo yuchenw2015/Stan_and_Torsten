@@ -7,8 +7,7 @@
 #### email: yuchenw2015@gmail.com
 #### Based on the PKPD Stan course by Bill Gillespie
 #### Link of the original materials: 
-#### https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-
-#### pharmacometric-applications/
+#### https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-pharmacometric-applications/
 #######################################################################
 
 rm(list = ls())
@@ -158,7 +157,7 @@ sim.cmdstan <- mod.sim$sample(data = dataSim,
                   thin = 1,
                   fixed_param = T)
 #convert output to a stan fit object
-sim <- read_stan_csv(sim.cmdstan)
+sim <- read_stan_csv(sim.cmdstan$output_files())
 ################################################################################################
 ### Assemble data set for fitting via Stan
 
