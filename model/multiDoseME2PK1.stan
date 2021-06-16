@@ -83,7 +83,7 @@ transformed parameters{
     parms[4] = V2[j];
     parms[5] = ka[j];
 
-    //x[start[j]:end[j],] = PKModelTwoCpt(time[start[j]:end[j]], 
+    // x[start[j]:end[j],] = PKModelTwoCpt(time[start[j]:end[j]], 
     x[start[j]:end[j],] = (pmx_solve_twocpt(time[start[j]:end[j]], 
 					amt[start[j]:end[j]],
 					rate[start[j]:end[j]],
@@ -92,7 +92,7 @@ transformed parameters{
 					cmt[start[j]:end[j]],
 					addl[start[j]:end[j]],
 					ss[start[j]:end[j]],
-					parms, F, tLag))'; //adapt function name and dimension
+					parms, F, tLag))'; // adapt function name and dimension
 
     cHat[start[j]:end[j]] = x[start[j]:end[j], 2] ./ V1[j];
   }
@@ -144,7 +144,7 @@ generated quantities{
     parmsPred[4] = V2Pred[j];
     parmsPred[5] = kaPred[j];
 
-    //xPred[start[j]:end[j],] = PKModelTwoCpt(time[start[j]:end[j]], 
+    / /xPred[start[j]:end[j],] = PKModelTwoCpt(time[start[j]:end[j]], 
     xPred[start[j]:end[j],] = (pmx_solve_twocpt(time[start[j]:end[j]], 
 					    amt[start[j]:end[j]],
 					    rate[start[j]:end[j]],
@@ -153,7 +153,7 @@ generated quantities{
 					    cmt[start[j]:end[j]],
 					    addl[start[j]:end[j]],
 					    ss[start[j]:end[j]],
-					    parmsPred, F, tLag))'; //adapt function name and dimension
+					    parmsPred, F, tLag))'; // adapt function name and dimension
 
     cHatPred[start[j]:end[j]] = xPred[start[j]:end[j], 2] ./ V1Pred[j];
   }
