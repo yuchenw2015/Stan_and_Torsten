@@ -171,10 +171,18 @@ pre code {
 
 <div id="issues-in-using-torsten" class="section level2">
 <h2>Issues in using Torsten</h2>
-<p>It is common to have error messages while building example Stan model via <code>rstan</code> due to a few updates of Torsten functions. These features are updated to Stan version 2.19.1.</p>
+<p>It is common to have error messages while building example Stan model via <code>rstan</code>, such as </p>
+<ul>
+<li><code>Variable &quot;oneCptPNODE&quot; does not exist</code> when calling generalOdeModel_rk45</li>
+<li><code>Variable &quot;twoCptPNODE&quot; does not exist</code> when calling generalOdeModel_rk45</li>
+<li><code>Function PKModelOneCpt not found</code></li>
+<li><code>Function linOdeModel not found</code></li>
+<li>...</li>
+</ul>
+<p>It is because there are a few updates of Torsten functions. According to a github post (<a href="https://github.com/metrumresearchgroup/Torsten/blob/master/CHANGELOG.md" class="uri">https://github.com/metrumresearchgroup/Torsten/blob/master/CHANGELOG.md</a>), these features were updated to Stan version 2.19.1.</p>
 <div id="function-names" class="section level3">
 <h3>Function names</h3>
-<p>According to a recent github post (<a href="https://github.com/metrumresearchgroup/Torsten/blob/master/CHANGELOG.md" class="uri">https://github.com/metrumresearchgroup/Torsten/blob/master/CHANGELOG.md</a>), the following functions are renamed:</p>
+<p>The following functions are renamed:</p>
 <ul>
 <li><code>PKModelOneCpt</code> → <code>pmx_solve_onecpt</code></li>
 <li><code>PKModelTwoCpt</code> → <code>pmx_solve_twocpt</code></li>
@@ -191,6 +199,7 @@ pre code {
 <div id="returned-matrix-dimension" class="section level3">
 <h3>Returned matrix dimension</h3>
 <p>The new version of the above functions return the <em>transpose</em> of the matrix returned by the old versions.</p>
+<p>Additionally, <code>rstan</code> might not use these updated Torsten functions. The following two sections will show how to adapt the old Stan model scripts and how to adapt the old R scripts to <code>cmdstanr</code> instead of <code>rstan</code>.</p>
 </div>
 </div>
 <div id="necessary-modification-for-the-stan-model-script" class="section level2">
