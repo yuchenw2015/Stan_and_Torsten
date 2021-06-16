@@ -1,3 +1,15 @@
+////////////////////////////////////////////////////////////////////////
+//// Adapted by Yuchen Wang                     
+//// Scripts adapted due to the updates of Torsten built-in functions                      
+//// Function names and the related matrix/vector dimensions apdated
+//// R scripts adapted to call these Torsten functions via cmdstan, see .R files
+//// Date: June/15/2021
+//// email: yuchenw2015@gmail.com
+//// Based on the PKPD Stan course by Bill Gillespie
+//// Link of the original materials: 
+//// https://www.metrumrg.com/course/advanced-use-stan-rstan-torsten-
+//// pharmacometric-applications/
+///////////////////////////////////////////////////////////////////////
 data{
   int<lower = 1> nSubjects;
   int<lower = 1> nt;
@@ -76,7 +88,8 @@ transformed parameters{
     parms[4] = V2[j];
     parms[5] = ka[j];
 
-    x[start[j]:end[j],] = PKModelTwoCpt(time[start[j]:end[j]], 
+    //x[start[j]:end[j],] = PKModelTwoCpt(time[start[j]:end[j]], 
+    x[start[j]:end[j],] = (pmx_solve_twocpt(time[start[j]:end[j]], 
 					amt[start[j]:end[j]],
 					rate[start[j]:end[j]],
 					ii[start[j]:end[j]],
@@ -84,7 +97,7 @@ transformed parameters{
 					cmt[start[j]:end[j]],
 					addl[start[j]:end[j]],
 					ss[start[j]:end[j]],
-					parms, F, tLag);
+					parms, F, tLag))'; //adapt function name and dimension
 
     cHat[start[j]:end[j]] = x[start[j]:end[j], 2] ./ V1[j];
   }
@@ -149,7 +162,8 @@ generated quantities{
     parmsPred[4] = V2Pred[j];
     parmsPred[5] = kaPred[j];
 
-    xPred[start[j]:end[j],] = PKModelTwoCpt(time[start[j]:end[j]], 
+    //xPred[start[j]:end[j],] = PKModelTwoCpt(time[start[j]:end[j]], 
+    xPred[start[j]:end[j],] = (pmx_solve_twocpt(time[start[j]:end[j]], 
 					    amt[start[j]:end[j]],
 					    rate[start[j]:end[j]],
 					    ii[start[j]:end[j]],
@@ -157,7 +171,7 @@ generated quantities{
 					    cmt[start[j]:end[j]],
 					    addl[start[j]:end[j]],
 					    ss[start[j]:end[j]],
-					    parmsPred, F, tLag);
+					    parmsPred, F, tLag))'; adapt function name and dimension
 
     cHatPred[start[j]:end[j]] = xPred[start[j]:end[j], 2] ./ V1Pred[j];
   }
